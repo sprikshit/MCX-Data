@@ -137,10 +137,10 @@ app.get('/commodity/mcx-silver', (req, res) => {
   }
 });
 
-app.get('/commodity/mcx-crude-Oil', (req, res) => {
+app.get('/commodity/mcx-crude-oil', (req, res) => {
   try {
-    if (commodityData && commodityData['MCX Crude Oil WITI']) {
-      const mcxGoldData = commodityData['MCX Crude Oil WITI'];
+    if (commodityData && commodityData['MCX Crude Oil WTI']) {
+      const mcxGoldData = commodityData['MCX Crude Oil WTI'];
       res.json(mcxGoldData);
     } else {
       res.status(404).json({ error: 'Data not found for MCX Crude Oil WITI' });
@@ -164,6 +164,7 @@ app.get('/commodity/mcx-natural-gas', (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching data.' });
   }
 });
+
 app.get('/commodity/mcx-copper', (req, res) => {
   try {
     if (commodityData && commodityData['MCX Copper']) {
@@ -191,6 +192,7 @@ app.get('/commodity/mcx-aluminium', (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching data.' });
   }
 });
+
 app.get('/commodity/mcx-nickel', (req, res) => {
   try {
     if (commodityData && commodityData['MCX Nickel']) {
@@ -204,10 +206,11 @@ app.get('/commodity/mcx-nickel', (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching data.' });
   }
 });
+
 app.get('/commodity/mcx-lead', (req, res) => {
   try {
-    if (commodityData && commodityData['MCX Lead']) {
-      const mcxGoldData = commodityData['MCX Lead'];
+    if (commodityData && commodityData['Lead']) {
+      const mcxGoldData = commodityData['Lead'];
       res.json(mcxGoldData);
     } else {
       res.status(404).json({ error: 'Data not found for MCX Lead' });
@@ -217,6 +220,7 @@ app.get('/commodity/mcx-lead', (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching data.' });
   }
 });
+
 app.get('/commodity/mcx-zinc', (req, res) => {
   try {
     if (commodityData && commodityData['MCX Zinc']) {
@@ -230,6 +234,7 @@ app.get('/commodity/mcx-zinc', (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching data.' });
   }
 });
+
 app.get('/commodity/mcx-cotton', (req, res) => {
   try {
     if (commodityData && commodityData['MCX Cotton']) {
