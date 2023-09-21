@@ -48,7 +48,7 @@ async function updateCommodityData() {
 }
 
 // Periodically update the data cache (every 40 seconds)
-const updateInterval = 3000; // 40 seconds
+const updateInterval = 300; // 40 seconds
 setInterval(updateCommodityData, updateInterval);
 updateCommodityData(); // Initial data update
 
