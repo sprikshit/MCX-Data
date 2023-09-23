@@ -251,6 +251,14 @@ app.get('/commodity/mcx-cotton', (req, res) => {
   }
 });
 
+app.get('/commodity/all', (req, res) => {
+  try {
+    res.json(commodityData);
+  } catch (error) {
+    console.error('An error occurred while fetching data:', error);
+    res.status(500).json({ error: 'An error occurred while fetching data.' });
+  }
+});
 
 // Start the server
 app.listen(PORT, () => {
