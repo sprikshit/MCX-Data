@@ -261,7 +261,7 @@ app.get('/commodity/agriculture', (req, res) => {
 
       // Assuming the data for agriculture commodities is stored in commodityData with specific keys
       agricultureData['MCX Cardamom'] = commodityData['MCX Cardamom'];
-      agricultureData['MCX Cotton'] = commodityData['MCX Cotton'];
+      // agricultureData['MCX Cotton'] = commodityData['MCX Cotton'];
       agricultureData['MCX Crude Palm Oil'] = commodityData['MCX Crude Palm Oil'];
       agricultureData['MCX Kapas'] = commodityData['MCX Kapas'];
       agricultureData['MCX Mentha Oil'] = commodityData['MCX Mentha Oil'];
