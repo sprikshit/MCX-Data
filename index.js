@@ -251,6 +251,75 @@ app.get('/commodity/mcx-cotton', (req, res) => {
   }
 });
 
+
+
+app.get('/commodity/agriculture', (req, res) => {
+  try {
+    if (commodityData && Object.keys(commodityData).length > 0) {
+      // Check if data for agriculture commodities exists
+      const agricultureData = {};
+
+      // Assuming the data for agriculture commodities is stored in commodityData with specific keys
+      agricultureData['MCX Cardamom'] = commodityData['MCX Cardamom'];
+      agricultureData['MCX Cotton'] = commodityData['MCX Cotton'];
+      agricultureData['MCX Crude Palm Oil'] = commodityData['MCX Crude Palm Oil'];
+      agricultureData['MCX Kapas'] = commodityData['MCX Kapas'];
+      agricultureData['MCX Mentha Oil'] = commodityData['MCX Mentha Oil'];
+      agricultureData['MCX Castor Seed'] = commodityData['MCX Castor Seed'];
+
+      res.json(agricultureData);
+    } else {
+      res.status(404).json({ error: 'Data not found for agriculture commodities' });
+    }
+  } catch (error) {
+    console.error('An error occurred while fetching data:', error);
+    res.status(500).json({ error: 'An error occurred while fetching data.' });
+  }
+});
+
+// Modify the updateCommodityData function to scrape data from the new URL
+async function updateCommodityData() {
+  try {
+    // Fetch the HTML content of the new URL
+    const response = await axios.get('https://in.investing.com/commodities/agriculture');
+
+    // Load the HTML content into Cheerio for parsing
+    const $ = cheerio.load(response.data);
+
+    // Find the commodity data using the provided HTML format
+    const newData = {};
+
+    // Loop through each table row with class "common-table-item"
+    $('tr.common-table-item').each((index, element) => {
+      const $row = $(element);
+      const commodityName = $row.find('td.col-name a.js-instrument-page-link').text();
+      const month = $row.find('td.col-month span.text').text();
+      const lastPrice = $row.find('td.col-last span.text').text();
+      const highPrice = $row.find('td.col-high span.text').text();
+      const lowPrice = $row.find('td.col-low span.text').text();
+      const change = $row.find('td.col-chg span.text').text();
+      const changePercentage = $row.find('td.col-chg_pct span.text').text();
+
+      newData[commodityName] = {
+        Expiry: month,
+        Last: lastPrice,
+        High: highPrice,
+        Low: lowPrice,
+        Chg: change,
+        'Chg%': changePercentage,
+      };
+    });
+
+    // Update the commodityData cache
+    commodityData = newData;
+  } catch (error) {
+    console.error('An error occurred while updating data:', error);
+  }
+}
+
+
+
+
 app.get('/commodity/all', (req, res) => {
   try {
     res.json(commodityData);
