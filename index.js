@@ -25,6 +25,7 @@ async function updateCommodityData() {
     $('tr.common-table-item').each((index, element) => {
       const $row = $(element);
       const commodityName = $row.find('td.col-name a.js-instrument-page-link').text();
+      const month = $row.find('td.col-month').text();
       const lastPrice = $row.find('td.col-last span.text').text();
       const highPrice = $row.find('td.col-high span.text').text();
       const lowPrice = $row.find('td.col-low span.text').text();
@@ -32,6 +33,7 @@ async function updateCommodityData() {
       const changePercentage = $row.find('td.col-chg_pct span.text').text();
 
       newData[commodityName] = {
+        Expiry : month,
         Last: lastPrice,
         High: highPrice,
         Low: lowPrice,
