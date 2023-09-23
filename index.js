@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 3000;
 
 const realTimeFuturesURL = 'https://in.investing.com/commodities/real-time-futures';
 const agricultureURL = 'https://in.investing.com/commodities/agriculture';
+const metalsURL = 'https://in.investing.com/commodities/metals';
 
 let commodityData = {}; // Initialize with an empty object
 
@@ -90,14 +91,56 @@ async function updateAgricultureData() {
   }
 }
 
-// Periodically update the data cache from both URLs
+// Function to scrape commodity data from the metals URL and update the cache
+async function updateMetalsData() {
+  try {
+    // Fetch the HTML content of the metals URL
+    const response = await axios.get(metalsURL);
+
+    // Load the HTML content into Cheerio for parsing
+    const $ = cheerio.load(response.data);
+
+    // Find the metals commodity data using the provided HTML format
+    const metalsData = {};
+
+    // Loop through each table row with class "common-table-item"
+    $('tr.common-table-item').each((index, element) => {
+      const $row = $(element);
+      const commodityName = $row.find('td.col-name a.js-instrument-page-link').text();
+      const month = $row.find('td.col-month span.text').text();
+      const lastPrice = $row.find('td.col-last span.text').text();
+      const highPrice = $row.find('td.col-high span.text').text();
+      const lowPrice = $row.find('td.col-low span.text').text();
+      const change = $row.find('td.col-chg span.text').text();
+      const changePercentage = $row.find('td.col-chg_pct span.text').text();
+
+      metalsData[commodityName] = {
+        Expiry: month,
+        Last: lastPrice,
+        High: highPrice,
+        Low: lowPrice,
+        Chg: change,
+        'Chg%': changePercentage,
+      };
+    });
+
+    // Update the commodityData cache with data from metals URL
+    commodityData = { ...commodityData, ...metalsData };
+  } catch (error) {
+    console.error('An error occurred while updating metals data:', error);
+  }
+}
+
+// Periodically update the data cache from all three URLs
 const updateInterval = 300; // 40 seconds
 setInterval(updateRealTimeFuturesData, updateInterval);
 setInterval(updateAgricultureData, updateInterval);
+setInterval(updateMetalsData, updateInterval);
 
 // Initial data update
 updateRealTimeFuturesData();
 updateAgricultureData();
+updateMetalsData();
 
 // Define the /commodity/all endpoint to return data for all specified commodities
 app.get('/commodity/all', (req, res) => {
@@ -122,6 +165,11 @@ app.get('/commodity/all', (req, res) => {
       'MCX Kapas',
       'MCX Mentha Oil',
       'MCX Castor Seed',
+      'MCX Gold Guinea',
+      'MCX Gold Mini',
+      'MCX Gold Petal',
+      'MCX Silver Mini',
+      'MCX Silver Micro',
     ];
 
     const filteredData = {};
