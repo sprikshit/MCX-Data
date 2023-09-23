@@ -5,15 +5,16 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const URL = 'https://in.investing.com/commodities/real-time-futures';
+const realTimeFuturesURL = 'https://in.investing.com/commodities/real-time-futures';
+const agricultureURL = 'https://in.investing.com/commodities/agriculture';
 
 let commodityData = {}; // Initialize with an empty object
 
-// Function to scrape commodity data and update the cache
-async function updateCommodityData() {
+// Function to scrape commodity data from the real-time futures URL and update the cache
+async function updateRealTimeFuturesData() {
   try {
-    // Fetch the HTML content of the webpage
-    const response = await axios.get(URL);
+    // Fetch the HTML content of the real-time futures URL
+    const response = await axios.get(realTimeFuturesURL);
 
     // Load the HTML content into Cheerio for parsing
     const $ = cheerio.load(response.data);
@@ -33,7 +34,7 @@ async function updateCommodityData() {
       const changePercentage = $row.find('td.col-chg_pct span.text').text();
 
       newData[commodityName] = {
-        Expiry : month,
+        Expiry: month,
         Last: lastPrice,
         High: highPrice,
         Low: lowPrice,
@@ -42,252 +43,24 @@ async function updateCommodityData() {
       };
     });
 
-    // Update the commodityData cache
-    commodityData = newData;
+    // Update the commodityData cache with data from real-time futures URL
+    commodityData = { ...commodityData, ...newData };
   } catch (error) {
-    console.error('An error occurred while updating data:', error);
+    console.error('An error occurred while updating real-time futures data:', error);
   }
 }
 
-// Periodically update the data cache (every 40 seconds)
-const updateInterval = 300; // 40 seconds
-setInterval(updateCommodityData, updateInterval);
-updateCommodityData(); // Initial data update
-
-// Define routes to fetch commodity data
-app.get('/commodity/ncdex-jeera', (req, res) => {
+// Function to scrape commodity data from the agriculture URL and update the cache
+async function updateAgricultureData() {
   try {
-    if (commodityData && commodityData['NCDEX Jeera']) {
-      const jeeraData = commodityData['NCDEX Jeera'];
-      res.json(jeeraData);
-    } else {
-      res.status(404).json({ error: 'Data not found for NCDEX Jeera' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/ncdex-coriander', (req, res) => {
-  try {
-    if (commodityData && commodityData['NCDEX Coriander']) {
-      const corianderData = commodityData['NCDEX Coriander'];
-      res.json(corianderData);
-    } else {
-      res.status(404).json({ error: 'Data not found for NCDEX Coriander' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/ncdex-guar-gum', (req, res) => {
-  try {
-    if (commodityData && commodityData['NCDEX Guar Gum']) {
-      const guarGumData = commodityData['NCDEX Guar Gum'];
-      res.json(guarGumData);
-    } else {
-      res.status(404).json({ error: 'Data not found for NCDEX Guar Gum' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/ncdex-soybean', (req, res) => {
-  try {
-    if (commodityData && commodityData['NCDEX Soybean']) {
-      const soybeanData = commodityData['NCDEX Soybean'];
-      res.json(soybeanData);
-    } else {
-      res.status(404).json({ error: 'Data not found for NCDEX Soybean' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/mcx-gold', (req, res) => {
-  try {
-    if (commodityData && commodityData['MCX Gold 1 Kg']) {
-      const mcxGoldData = commodityData['MCX Gold 1 Kg'];
-      res.json(mcxGoldData);
-    } else {
-      res.status(404).json({ error: 'Data not found for MCX Gold 1 Kg' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/mcx-silver', (req, res) => {
-  try {
-    if (commodityData && commodityData['MCX Silver']) {
-      const mcxGoldData = commodityData['MCX Silver'];
-      res.json(mcxGoldData);
-    } else {
-      res.status(404).json({ error: 'Data not found for MCX Silver' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/mcx-crude-oil', (req, res) => {
-  try {
-    if (commodityData && commodityData['MCX Crude Oil WTI']) {
-      const mcxGoldData = commodityData['MCX Crude Oil WTI'];
-      res.json(mcxGoldData);
-    } else {
-      res.status(404).json({ error: 'Data not found for MCX Crude Oil WITI' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/mcx-natural-gas', (req, res) => {
-  try {
-    if (commodityData && commodityData['MCX Copper']) {
-      const mcxGoldData = commodityData['MCX Copper'];
-      res.json(mcxGoldData);
-    } else {
-      res.status(404).json({ error: 'Data not found for MCX Copper' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/mcx-copper', (req, res) => {
-  try {
-    if (commodityData && commodityData['MCX Copper']) {
-      const mcxGoldData = commodityData['MCX Copper'];
-      res.json(mcxGoldData);
-    } else {
-      res.status(404).json({ error: 'Data not found for MCX Copper' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/mcx-aluminium', (req, res) => {
-  try {
-    if (commodityData && commodityData['MCX Aluminium']) {
-      const mcxGoldData = commodityData['MCX Aluminium'];
-      res.json(mcxGoldData);
-    } else {
-      res.status(404).json({ error: 'Data not found for MCX Aluminium' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/mcx-nickel', (req, res) => {
-  try {
-    if (commodityData && commodityData['MCX Nickel']) {
-      const mcxGoldData = commodityData['MCX Nickel'];
-      res.json(mcxGoldData);
-    } else {
-      res.status(404).json({ error: 'Data not found for MCX Nickel' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/mcx-lead', (req, res) => {
-  try {
-    if (commodityData && commodityData['Lead']) {
-      const mcxGoldData = commodityData['Lead'];
-      res.json(mcxGoldData);
-    } else {
-      res.status(404).json({ error: 'Data not found for MCX Lead' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/mcx-zinc', (req, res) => {
-  try {
-    if (commodityData && commodityData['MCX Zinc']) {
-      const mcxGoldData = commodityData['MCX Zinc'];
-      res.json(mcxGoldData);
-    } else {
-      res.status(404).json({ error: 'Data not found for MCX Zinc' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-app.get('/commodity/mcx-cotton', (req, res) => {
-  try {
-    if (commodityData && commodityData['MCX Cotton']) {
-      const mcxGoldData = commodityData['MCX Cotton'];
-      res.json(mcxGoldData);
-    } else {
-      res.status(404).json({ error: 'Data not found for MCX Cotton' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-
-
-app.get('/commodity/agriculture', (req, res) => {
-  try {
-    if (commodityData && Object.keys(commodityData).length > 0) {
-      // Check if data for agriculture commodities exists
-      const agricultureData = {};
-
-      // Assuming the data for agriculture commodities is stored in commodityData with specific keys
-      agricultureData['MCX Cardamom'] = commodityData['MCX Cardamom'];
-      // agricultureData['MCX Cotton'] = commodityData['MCX Cotton'];
-      agricultureData['MCX Crude Palm Oil'] = commodityData['MCX Crude Palm Oil'];
-      agricultureData['MCX Kapas'] = commodityData['MCX Kapas'];
-      agricultureData['MCX Mentha Oil'] = commodityData['MCX Mentha Oil'];
-      agricultureData['MCX Castor Seed'] = commodityData['MCX Castor Seed'];
-
-      res.json(agricultureData);
-    } else {
-      res.status(404).json({ error: 'Data not found for agriculture commodities' });
-    }
-  } catch (error) {
-    console.error('An error occurred while fetching data:', error);
-    res.status(500).json({ error: 'An error occurred while fetching data.' });
-  }
-});
-
-// Modify the updateCommodityData function to scrape data from the new URL
-async function updateCommodityData() {
-  try {
-    // Fetch the HTML content of the new URL
-    const response = await axios.get('https://in.investing.com/commodities/agriculture');
+    // Fetch the HTML content of the agriculture URL
+    const response = await axios.get(agricultureURL);
 
     // Load the HTML content into Cheerio for parsing
     const $ = cheerio.load(response.data);
 
-    // Find the commodity data using the provided HTML format
-    const newData = {};
+    // Find the agriculture commodity data using the provided HTML format
+    const agricultureData = {};
 
     // Loop through each table row with class "common-table-item"
     $('tr.common-table-item').each((index, element) => {
@@ -300,7 +73,7 @@ async function updateCommodityData() {
       const change = $row.find('td.col-chg span.text').text();
       const changePercentage = $row.find('td.col-chg_pct span.text').text();
 
-      newData[commodityName] = {
+      agricultureData[commodityName] = {
         Expiry: month,
         Last: lastPrice,
         High: highPrice,
@@ -310,19 +83,55 @@ async function updateCommodityData() {
       };
     });
 
-    // Update the commodityData cache
-    commodityData = newData;
+    // Update the commodityData cache with data from agriculture URL
+    commodityData = { ...commodityData, ...agricultureData };
   } catch (error) {
-    console.error('An error occurred while updating data:', error);
+    console.error('An error occurred while updating agriculture data:', error);
   }
 }
 
+// Periodically update the data cache from both URLs
+const updateInterval = 300; // 40 seconds
+setInterval(updateRealTimeFuturesData, updateInterval);
+setInterval(updateAgricultureData, updateInterval);
 
+// Initial data update
+updateRealTimeFuturesData();
+updateAgricultureData();
 
-
+// Define the /commodity/all endpoint to return data for all specified commodities
 app.get('/commodity/all', (req, res) => {
   try {
-    res.json(commodityData);
+    const specifiedCommodities = [
+      'NCDEX Jeera',
+      'NCDEX Coriander',
+      'NCDEX Guar Gum',
+      'NCDEX Soybean',
+      'MCX Gold 1 Kg',
+      'MCX Silver',
+      'MCX Crude Oil WTI',
+      'MCX Natural Gas',
+      'MCX Aluminium',
+      'MCX Copper',
+      'MCX Nickel',
+      'Lead',
+      'MCX Zinc',
+      'MCX Cotton',
+      'MCX Cardamom',
+      'MCX Crude Palm Oil',
+      'MCX Kapas',
+      'MCX Mentha Oil',
+      'MCX Castor Seed',
+    ];
+
+    const filteredData = {};
+    for (const commodity of specifiedCommodities) {
+      if (commodityData[commodity]) {
+        filteredData[commodity] = commodityData[commodity];
+      }
+    }
+
+    res.json(filteredData);
   } catch (error) {
     console.error('An error occurred while fetching data:', error);
     res.status(500).json({ error: 'An error occurred while fetching data.' });
